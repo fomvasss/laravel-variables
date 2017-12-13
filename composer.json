@@ -1,0 +1,43 @@
+{
+    "name": "fomvasss/laravel-variables",
+    "description": "Management of variables/settings in Laravel projects",
+    "type": "composer-package",
+    "keywords": [
+        "fomvasss",
+        "laravel",
+        "variable",
+        "settings"
+    ],
+    "homepage": "https://github.com/fomvasss/laravel-variables",
+    "authors": [
+        {
+            "name": "Vasyl Fomin",
+            "email": "fomvasss@gmail.com",
+            "role": "Developer"
+        }
+    ],
+    "license": "MIT",
+    "require": {
+        "php" : ">=7.0.0",
+        "illuminate/support": "5.3.*|5.4.*|5.5.*",
+        "illuminate/database": "5.3.*|5.4.*|5.5.*"
+    },
+    "autoload": {
+        "files": [
+            "src/helpers.php"
+        ],
+        "psr-4": {
+            "Fomvasss\\Variable\\": "src"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Fomvasss\\Variable\\VariableServiceProvider"
+            ],
+            "aliases": {
+                "Variable": "Fomvasss\\Variable\\Facade"
+            }
+        }
+    }
+}
