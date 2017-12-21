@@ -25,7 +25,6 @@ class VariableServiceProvider extends ServiceProvider
              ], 'variables-migrations');
         }
 
-
         if ($this->app->runningInConsole()) {
              $this->commands([
                  Commands\SetVariable::class,
