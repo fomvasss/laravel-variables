@@ -24,14 +24,21 @@ class VariableManager implements VariableManagerContract
     /**
      * VariableManager constructor.
      *
-     * @param \Fomvasss\Variable\Variable $variableModel
      * @param \Illuminate\Cache\Repository $cacheRepo
      */
-    public function __construct(Variable $variableModel, CacheRepository $cacheRepo)
+    public function __construct(CacheRepository $cacheRepo)
     {
-        $this->variableModel = $variableModel;
-        $this->cacheRepo = $cacheRepo;
         $this->cacheTime = config('variables.cache.time', 360);
+        $this->variableModel = $this->model();
+        $this->cacheRepo = $cacheRepo;
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function model()
+    {
+        return app()->make(config('variables.model', \Fomvasss\Variable\Variable::class));
     }
 
     /**
@@ -48,9 +55,9 @@ class VariableManager implements VariableManagerContract
      * @param null $default
      * @return null
      */
-    public function get($name, $default = null)
+    public function first($name, $default = null)
     {
-        if (!empty($setting = $this->getByName($name))) {
+        if (!empty($setting = $this->firstByName($name))) {
             return $setting->value;
         }
 
@@ -60,13 +67,18 @@ class VariableManager implements VariableManagerContract
     /**
      * @param $name
      * @param null $value
+     * @param null $description
      * @return int
      */
-    public function set($name, $value = null): int
+    public function set($name, $value = null, $description = null): int
     {
         $this->cacheRepo->forget($this->cacheName);
 
-        return $this->variableModel->updateOrCreate(['name' => $name, 'locale' => $this->locale], ['value' => $value]) ? 1 : 0;
+        return $this->variableModel->updateOrCreate([
+            'name' => $name, 'locale' => $this->locale
+        ], [
+            'value' => $value, 'description' => $description,
+        ]) ? 1 : 0;
     }
 
     /**
@@ -100,7 +112,11 @@ class VariableManager implements VariableManagerContract
     {
         $r = 0;
         foreach ($attributes as $name => $value) {
-            $this->variableModel->updateOrCreate(['name' => $name, 'locale' => $this->locale], ['value' => $value]);
+            $this->variableModel->updateOrCreate([
+                'name' => $name, 'locale' => $this->locale
+            ], [
+                'value' => $value
+            ]);
             $r++;
         }
         $this->cacheRepo->forget($this->cacheName);
@@ -111,7 +127,7 @@ class VariableManager implements VariableManagerContract
      * @param $name
      * @return mixed
      */
-    protected function getByName($name)
+    protected function firstByName($name)
     {
         return $this->getAll()->where('name', $name)->where('locale', $this->locale)->first();
     }

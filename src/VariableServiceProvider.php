@@ -42,7 +42,7 @@ class VariableServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->mergeConfigFrom(__DIR__.'/../config/variables.php', 'variables.php');
+        $this->mergeConfigFrom(__DIR__.'/../config/variables.php', 'variables');
 
         $this->app->singleton(VariableManagerContract::class, VariableManager::class);
     }

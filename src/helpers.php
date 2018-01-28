@@ -10,7 +10,7 @@ if (! function_exists('var_all')) {
 if (! function_exists('var_get')) {
     function var_get($name, $default = null, $locale = null)
     {
-        return app(\Fomvasss\Variable\VariableManagerContract::class)->locale($locale)->get($name, $default);
+        return app(\Fomvasss\Variable\VariableManagerContract::class)->locale($locale)->first($name, $default);
     }
 }
 

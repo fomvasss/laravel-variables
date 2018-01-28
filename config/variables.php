@@ -7,6 +7,8 @@
 |
 */
 return [
+    'model' => \Fomvasss\Variable\Variable::class,
+
     'cache' => [
         'time' => 360,
     ]

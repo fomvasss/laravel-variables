@@ -6,7 +6,7 @@ interface VariableManagerContract
 {
     public function all(): array;
 
-    public function get($name, $default = null);
+    public function first($name, $default = null);
 
     public function set($name, $value = null): int;
 

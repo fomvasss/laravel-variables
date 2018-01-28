@@ -11,6 +11,7 @@ class Variable extends Model
     protected $fillable = [
         'name',
         'value',
+        'description',
         'locale',
     ];
 }

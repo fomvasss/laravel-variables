@@ -48,7 +48,7 @@ use Fomvasss\Variable\Facades\Variable;
 
 Variable::set('site_name', 'My Site);
 Variable::all();
-Variable::get('site_name');
+Variable::first('site_name');
 Variable::delete('site_name');
 Variable::setArray(['titles' => 'TiTlE', 'slugan' => 'Lorem ipsun!']);
 ```
@@ -62,7 +62,7 @@ Variable::locale('ru')->delete('site_name');
 ```php
 function (\Fomvasss\Variable\VariableManagerContract $mng)
 {
-	$mng->get('site_name');
+	$mng->first('site_name');
 }
 ```
 
