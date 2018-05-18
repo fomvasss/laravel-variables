@@ -38,6 +38,7 @@ Run migrate:
 ### Helpers
 - `var_all($locale = null)`
 - `var_get($name, $default = null, $locale = null)`
+- `var_json_decode_get($name, $asoc = true, $locale = null) //bool $asoc - if true - return array, if false - return object (see php json_decode)`
 - `var_set($name, $value = null, $locale = null)`
 - `var_delete($name, $locale = null)`
 - `var_set_array(array $attributes, $locale = null)`
@@ -49,6 +50,7 @@ use Fomvasss\Variable\Facades\Variable;
 Variable::set('site_name', 'My Site);
 Variable::all();
 Variable::first('site_name');
+Variable::firstJsonDecode('socialite_tokens', true);
 Variable::delete('site_name');
 Variable::setArray(['titles' => 'TiTlE', 'slugan' => 'Lorem ipsun!']);
 ```
@@ -73,5 +75,5 @@ variable:get     # Get one variable
 variable:delete  # Delete variable
 variable:set     # Get all variables
 
-php artisan cache:forget fomvasss.variables.cache
+php artisan cache:forget laravel.variables.cache
 ```

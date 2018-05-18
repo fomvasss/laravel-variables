@@ -11,5 +11,6 @@ return [
 
     'cache' => [
         'time' => 360,
+        'name' => 'laravel.variables.cache',
     ]
 ];

@@ -17,7 +17,7 @@ class VariableManager implements VariableManagerContract
 
     protected $locale = null;
 
-    private $cacheName = 'fomvasss.variables.cache';
+    private $cacheName;
 
     protected $cacheTime;
 
@@ -29,6 +29,7 @@ class VariableManager implements VariableManagerContract
     public function __construct(CacheRepository $cacheRepo)
     {
         $this->cacheTime = config('variables.cache.time', 360);
+        $this->cacheName = config('variables.cache.name', 'laravel.variables.cache');
         $this->variableModel = $this->model();
         $this->cacheRepo = $cacheRepo;
     }
@@ -57,11 +58,25 @@ class VariableManager implements VariableManagerContract
      */
     public function first($name, $default = null)
     {
-        if (!empty($setting = $this->firstByName($name))) {
-            return $setting->value;
+        if (!empty($variable = $this->firstByName($name))) {
+            return $variable->value;
         }
 
         return $default;
+    }
+
+    /**
+     * @param $name
+     * @param bool $asoc
+     * @return array|mixed
+     */
+    public function firstJsonDecode($name, $asoc = true)
+    {
+        if (!empty($variable = $this->firstByName($name))) {
+            return json_decode($variable->value, $asoc);
+        }
+
+        return [];
     }
 
     /**
@@ -87,8 +102,8 @@ class VariableManager implements VariableManagerContract
      */
     public function delete($name): int
     {
-        $this->cacheRepo->forget($this->cacheName);
         $res = $this->variableModel->where('name', $name)->where('locale', $this->locale)->delete();
+        $this->cacheRepo->forget($this->cacheName);
 
         return $res ? 0 : 1;
     }

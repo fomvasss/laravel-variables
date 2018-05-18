@@ -14,6 +14,13 @@ if (! function_exists('var_get')) {
     }
 }
 
+if (! function_exists('var_json_decode_get')) {
+    function var_json_decode_get($name, $asoc = true, $locale = null)
+    {
+        return app(\Fomvasss\Variable\VariableManagerContract::class)->locale($locale)->firstJsonDecode($name, $asoc);
+    }
+}
+
 if (! function_exists('var_set')) {
     function var_set($name, $value = null, $locale = null)
     {

@@ -8,6 +8,8 @@ interface VariableManagerContract
 
     public function first($name, $default = null);
 
+    public function firstJsonDecode($name, $asoc = true);
+
     public function set($name, $value = null): int;
 
     public function delete($name): int;
