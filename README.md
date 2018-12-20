@@ -12,14 +12,18 @@ Run:
 	composer require fomvasss/laravel-variables
 ```
 ---
-For Laravel > 5.5 add to the service-providers list in app.php next
-providers:
+For Laravel < 5.5 add in `config/app.php` next
 ```php
-	Fomvasss\Taxonomy\FieldFileServiceProvider::class,
-```
-aliases:
-```php
+<?php
+'providers' => [
+    //...
+	Fomvasss\Variable\VariableServiceProvider::class,
+],
+//...
+aliases => [
+    //...
 	'Variable' => Fomvasss\Variable\Facades\Variable::class,
+],
 ```
 ---
 
@@ -35,45 +39,45 @@ Run migrate:
 
 ---
 ## Usage
-### Helpers
-- `var_all($locale = null)`
-- `var_get($name, $default = null, $locale = null)`
-- `var_json_decode_get($name, $asoc = true, $locale = null) //bool $asoc - if true - return array, if false - return object (see php json_decode)`
-- `var_set($name, $value = null, $locale = null)`
-- `var_delete($name, $locale = null)`
-- `var_set_array(array $attributes, $locale = null)`
 
 ### Facade
+
 ```php
+<?php
 use Fomvasss\Variable\Facades\Variable;
 
-Variable::set('site_name', 'My Site);
 Variable::all();
-Variable::first('site_name');
-Variable::firstJsonDecode('socialite_tokens', true);
-Variable::delete('site_name');
-Variable::setArray(['titles' => 'TiTlE', 'slugan' => 'Lorem ipsun!']);
+Variable::get('var_key');
 ```
+
 You can use the localization vars:
 ```php
+<?php
 Variable::locale('en')->all();
-Variable::locale('ru')->delete('site_name');
+Variable::locale('ru')->get('var_key');
 ```
 
 ### DI VariableManagerContract class
 ```php
-function (\Fomvasss\Variable\VariableManagerContract $mng)
+function (\Fomvasss\Variable\VariableManagerContract $variable)
 {
-	$mng->first('site_name');
+	$variable->get('app_name');
 }
 ```
 
+### Helpers
+- `variable($name, $default = null, $locale = null)`
+
+### Replace configs with variables
+
+Set in `config/variables.php` option `config_key_for_vars=vars`
+
+Add keys in `variable_config` array: variable_key = config_key
+
 ### Console command
 ```bash
-variable:get-all     # Get all variables
+variable:all     # Get all variables
 variable:get     # Get one variable
-variable:delete  # Delete variable
-variable:set     # Get all variables
 
 php artisan cache:forget laravel.variables.cache
 ```

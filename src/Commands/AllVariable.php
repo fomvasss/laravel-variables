@@ -11,7 +11,7 @@ use Illuminate\Console\Command;
  */
 class AllVariable extends Command
 {
-    protected $signature = 'variable:get-all
+    protected $signature = 'variable:all
                 {locale? : The locale variable}';
 
     protected $description = 'Get all variables';
@@ -21,6 +21,7 @@ class AllVariable extends Command
         $variableMng = app(\Fomvasss\Variable\VariableManagerContract::class);
 
         $variables = $variableMng->locale($this->argument('locale'))->all();
+
         print_r($variables);
     }
 }

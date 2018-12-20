@@ -11,6 +11,6 @@ class Variable extends \Illuminate\Support\Facades\Facade
      */
     protected static function getFacadeAccessor()
     {
-        return app(VariableManagerContract::class);
+        return VariableManagerContract::class;
     }
 }
