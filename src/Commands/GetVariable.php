@@ -21,7 +21,8 @@ class GetVariable extends Command
     {
         $variableMng = app(\Fomvasss\Variable\VariableManagerContract::class);
 
-        $variable = $variableMng->locale($this->argument('locale'))->first($this->argument('name'), '');
+        $variable = $variableMng->locale($this->argument('locale'))->get($this->argument('name'));
+
         print_r($variable . "\n");
     }
 }

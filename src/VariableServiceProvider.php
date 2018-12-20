@@ -2,6 +2,7 @@
 
 namespace Fomvasss\Variable;
 
+use Fomvasss\Variable\Models\Variable;
 use Illuminate\Support\ServiceProvider;
 
 class VariableServiceProvider extends ServiceProvider
@@ -25,12 +26,14 @@ class VariableServiceProvider extends ServiceProvider
              ], 'variables-migrations');
         }
 
+        if ($this->app['config']->get('variables.config_key_for_vars')) {
+            $this->replaceConfigsWithVariables();
+        }
+
         if ($this->app->runningInConsole()) {
              $this->commands([
-                 Commands\SetVariable::class,
                  Commands\AllVariable::class,
                  Commands\GetVariable::class,
-                 Commands\DeleteVariable::class,
              ]);
         }
     }
@@ -44,6 +47,30 @@ class VariableServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__.'/../config/variables.php', 'variables');
 
-        $this->app->singleton(VariableManagerContract::class, VariableManager::class);
+        $this->app->singleton(VariableManagerContract::class, function () {
+            $cacheRepo = $this->app->make(\Illuminate\Cache\Repository::class);
+            return new VariableManager(new Variable, $cacheRepo, $this->app);
+        });
+    }
+
+    protected function replaceConfigsWithVariables()
+    {
+        $this->app->booted(function () {
+
+            // package config
+            $config = $this->app['config']->get('variables');
+
+            // replace configs with variables
+            $variableConfig = $config['variable_config'];
+
+            $variables = $this->app->make(VariableManagerContract::class)->all();
+
+            foreach ($variables as $varKey => $varValue) {
+
+                $configKey = $variableConfig[$varKey] ?? ($config['config_key_for_vars'] . '.' . $varKey);
+
+                $this->app['config']->set($configKey, $varValue);
+            }
+        });
     }
 }

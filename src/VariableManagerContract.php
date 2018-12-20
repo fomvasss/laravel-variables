@@ -4,17 +4,21 @@ namespace Fomvasss\Variable;
 
 interface VariableManagerContract
 {
+    /**
+     * @return array
+     */
     public function all(): array;
 
-    public function first($name, $default = null);
+    /**
+     * @param $name
+     * @param null $default
+     * @return mixed
+     */
+    public function get(string $name, $default = null);
 
-    public function firstJsonDecode($name, $asoc = true);
-
-    public function set($name, $value = null): int;
-
-    public function delete($name): int;
-
+    /**
+     * @param string $locale
+     * @return mixed
+     */
     public function locale(string $locale = null);
-
-    public function setArray(array $attributes): int;
 }

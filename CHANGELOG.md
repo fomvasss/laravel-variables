@@ -1,5 +1,9 @@
 # Changelog LaravelVariables
 
+## 2.0.0 - 2018-12-20
+- Added replace config
+- Refactor & optimization
+
 ## 1.2.0 - 2018-05-18
 
 - Add json decode method && helper
