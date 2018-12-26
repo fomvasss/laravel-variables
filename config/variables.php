@@ -18,7 +18,7 @@ return [
      |  If empty this - option OFF
      | -----------------------------------------------------------------
      */
-    'config_key_for_vars' => '',
+    'config_key_for_vars' => 'vars',
 
     /* -----------------------------------------------------------------
      |  Replace configs with variables

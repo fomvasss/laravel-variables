@@ -78,6 +78,17 @@ Add keys in `variable_config` array: variable_key = config_key
 ```bash
 variable:all     # Get all variables
 variable:get     # Get one variable
+```
 
+### Use cache
+Set in `config/variables.php` option `cache.time` min for cache.
+
+Clear variable cache with console:
+```bash
 php artisan cache:forget laravel.variables.cache
+```
+
+Clear variable cache in controller after update var:
+```php
+\Cache::forget('laravel.variables.cache');
 ```

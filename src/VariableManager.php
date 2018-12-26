@@ -9,6 +9,8 @@ namespace Fomvasss\Variable;
  */
 class VariableManager implements VariableManagerContract
 {
+    protected $app;
+
     protected $variableModel;
 
     protected $cacheRepository;
@@ -43,7 +45,13 @@ class VariableManager implements VariableManagerContract
      */
     public function get(string $key, $default = null)
     {
-        return $this->all()[$key] ?? $default;
+        try {
+            return $this->all()[$key] ?? $default;
+        } catch (\Exception $exception) {
+            $this->app['log']->info(__CLASS__ . ' - ' . $exception->getMessage());
+
+            return $default;
+        }
     }
 
     /**

@@ -26,9 +26,7 @@ class VariableServiceProvider extends ServiceProvider
              ], 'variables-migrations');
         }
 
-        if ($this->app['config']->get('variables.config_key_for_vars')) {
-            $this->replaceConfigsWithVariables();
-        }
+        $this->replaceConfigsWithVariables();
 
         if ($this->app->runningInConsole()) {
              $this->commands([
@@ -63,14 +61,23 @@ class VariableServiceProvider extends ServiceProvider
             // replace configs with variables
             $variableConfig = $config['variable_config'];
 
-            $variables = $this->app->make(VariableManagerContract::class)->all();
+            // TODO: hardcode!
+            try {
+                $variables = $this->app->make(VariableManagerContract::class)->all();
 
-            foreach ($variables as $varKey => $varValue) {
-
-                $configKey = $variableConfig[$varKey] ?? ($config['config_key_for_vars'] . '.' . $varKey);
-
-                $this->app['config']->set($configKey, $varValue);
+                foreach ($variables as $varKey => $varValue) {
+                    $configKey = $variableConfig[$varKey] ?? ($config['config_key_for_vars'] . '.' . $varKey) ?? '';
+                    if (! empty($variableConfig[$varKey])) {
+                        $this->app['config']->set($variableConfig[$varKey], $varValue);
+                    }
+                    if (! empty($config['config_key_for_vars'])) {
+                        $this->app['config']->set($config['config_key_for_vars'] . '.' . $varKey, $varValue);
+                    }
+                }
+            } catch (\Exception $exception) {
+                $this->app['log']->info(__CLASS__ . ' - ' . $exception->getMessage());
             }
+
         });
     }
 }
