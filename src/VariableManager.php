@@ -15,9 +15,9 @@ class VariableManager implements VariableManagerContract
 
     protected $cacheRepository;
 
-    protected $locale;
+    protected $locale = null;
 
-    protected $variables;
+    protected $variables = null;
 
     /**
      * VariableManager constructor.
@@ -40,18 +40,17 @@ class VariableManager implements VariableManagerContract
 
     /**
      * @param string $key
-     * @param string|null $default
-     * @return mixed|string
+     * @param null $default
+     * @return mixed|null
      */
     public function get(string $key, $default = null)
     {
-        try {
-            return $this->all()[$key] ?? $default;
-        } catch (\Exception $exception) {
-            $this->app['log']->info(__CLASS__ . ' - ' . $exception->getMessage());
-
-            return $default;
-        }
+       if (isset($this->all()[$key])) {
+           return $this->all()[$key];
+       }
+       
+       return $default;
+        
     }
 
     /**
@@ -59,15 +58,19 @@ class VariableManager implements VariableManagerContract
      */
     public function all(): array
     {
-        if (! isset($this->variables)) {
+        if ($this->variables === null) {
 
             $all = $this->cacheRepository->remember($this->config['cache']['name'], $this->config['cache']['time'], function () {
-                return $this->variableModel->select('key', 'value', 'locale')->get();
+                return $this->getCollection();
             });
 
-            $allByLocale = $this->locale ? $all->where('locale', $this->locale) : $all;
+            if ($all) {
+                $allByLocale = $this->locale ? $all->where('locale', $this->locale) : $all;
+                $this->variables = $allByLocale->pluck('value', 'key')->toArray();
+            } else {
+                $this->variables = [];
+            }
 
-            $this->variables = $allByLocale->pluck('value', 'key')->toArray();
         }
 
         return $this->variables;
@@ -82,5 +85,19 @@ class VariableManager implements VariableManagerContract
         $this->locale = $locale;
 
         return $this;
+    }
+
+    /**
+     * @return \Illuminate\Support\Collection | null
+     */
+    protected function getCollection()
+    {
+        try {
+            return $this->variableModel->select('key', 'value', 'locale')->get();
+        } catch (\Exception $exception) {
+            $this->app['log']->info(__CLASS__ . ' - ' . $exception->getMessage());
+
+            return null;
+        }
     }
 }
