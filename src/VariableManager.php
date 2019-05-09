@@ -87,6 +87,11 @@ class VariableManager implements VariableManagerContract
         return $this;
     }
 
+    public function cacheClear()
+    {
+        return $this->cacheRepository->forget($this->config['cache']['name']);
+    }
+
     /**
      * @return \Illuminate\Support\Collection | null
      */

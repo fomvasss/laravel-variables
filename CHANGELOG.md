@@ -1,5 +1,8 @@
 # Changelog LaravelVariables
 
+## 3.0.0 - 2019-05-09
+- Support Laravel 5.8
+
 ## 2.0.0 - 2018-12-20
 - Added replace config
 - Refactor & optimization

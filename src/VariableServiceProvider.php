@@ -61,12 +61,10 @@ class VariableServiceProvider extends ServiceProvider
             // replace configs with variables
             $variableConfig = $config['variable_config'];
 
-            // TODO: hardcode!
             try {
                 $variables = $this->app->make(VariableManagerContract::class)->all();
 
                 foreach ($variables as $varKey => $varValue) {
-                    $configKey = $variableConfig[$varKey] ?? ($config['config_key_for_vars'] . '.' . $varKey) ?? '';
                     if (! empty($variableConfig[$varKey])) {
                         $this->app['config']->set($variableConfig[$varKey], $varValue);
                     }
@@ -75,7 +73,7 @@ class VariableServiceProvider extends ServiceProvider
                     }
                 }
             } catch (\Exception $exception) {
-                $this->app['log']->info(__CLASS__ . ' - ' . $exception->getMessage());
+                $this->app['log']->info($exception->getMessage());
             }
 
         });

@@ -12,20 +12,6 @@ Run:
 	composer require fomvasss/laravel-variables
 ```
 ---
-For Laravel < 5.5 add in `config/app.php` next
-```php
-<?php
-'providers' => [
-    //...
-	Fomvasss\Variable\VariableServiceProvider::class,
-],
-//...
-aliases => [
-    //...
-	'Variable' => Fomvasss\Variable\Facades\Variable::class,
-],
-```
----
 
 Publish the config, migration:
 ```bash
@@ -81,7 +67,7 @@ variable:get     # Get one variable
 ```
 
 ### Use cache
-Set in `config/variables.php` option `cache.time` min for cache.
+Set in `config/variables.php` option `cache.time` seconds for cache.
 
 Clear variable cache with console:
 ```bash
@@ -89,6 +75,10 @@ php artisan cache:forget laravel.variables.cache
 ```
 
 Clear variable cache in controller after update var:
+```php
+Variable::cacheClear();
+```
+or
 ```php
 \Cache::forget('laravel.variables.cache');
 ```

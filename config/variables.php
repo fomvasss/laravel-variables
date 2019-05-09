@@ -36,7 +36,7 @@ return [
      */
     'cache' => [
 
-        'time' => 360,
+        'time' => 3600, //sec.
 
         'name' => 'laravel.variables.cache',
     ]
