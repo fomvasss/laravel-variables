@@ -16,9 +16,9 @@
     "license": "MIT",
     "require": {
         "php" : ">=7.2.0",
-        "illuminate/support": "5.8.*",
-        "illuminate/database": "5.8.*",
-        "illuminate/cache": "5.8.*"
+        "illuminate/support": "^5.8|^6.0",
+        "illuminate/database": "^5.8|^6.0",
+        "illuminate/cache": "^5.8|^6.0"
     },
     "autoload": {
         "files": [
@@ -34,7 +34,7 @@
                 "Fomvasss\\Variable\\VariableServiceProvider"
             ],
             "aliases": {
-                "Variable": "Fomvasss\\Variable\\Facade"
+                "Variable": "Fomvasss\\Variable\\Facades"
             }
         }
     }

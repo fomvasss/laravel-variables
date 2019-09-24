@@ -50,7 +50,6 @@ class VariableManager implements VariableManagerContract
        }
        
        return $default;
-        
     }
 
     /**
@@ -93,16 +92,16 @@ class VariableManager implements VariableManagerContract
     }
 
     /**
-     * @return \Illuminate\Support\Collection | null
+     * @return |null
      */
     protected function getCollection()
     {
         try {
             return $this->variableModel->select('key', 'value', 'locale')->get();
         } catch (\Exception $exception) {
-            $this->app['log']->info(__CLASS__ . ' - ' . $exception->getMessage());
+            $this->app['log']->info(__CLASS__ . ': ' . $exception->getMessage());
 
-            return null;
+            return false;
         }
     }
 }

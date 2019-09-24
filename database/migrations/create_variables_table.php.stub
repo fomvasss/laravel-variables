@@ -16,12 +16,11 @@ class CreateVariablesTable extends Migration
             $tableName = config('variables.table_name');
 
             Schema::create($tableName, function (Blueprint $table) {
-				$table->bigIncrements('id');
+                $table->bigIncrements('id');
                 $table->string('key')->index();
                 $table->text('value')->nullable();
-//                $table->string('description')->nullable();
-                $table->string('locale', 10)->nullable();
-
+                $table->string('locale', 5)->nullable();
+                
                 $table->unique(['key', 'locale']);
             });
         }

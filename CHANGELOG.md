@@ -1,5 +1,8 @@
 # Changelog LaravelVariables
 
+## 3.1.0 - 2019-09-24
+- Support Laravel 6
+
 ## 3.0.0 - 2019-05-09
 - Support Laravel 5.8
 
