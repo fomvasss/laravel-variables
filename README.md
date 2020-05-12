@@ -34,6 +34,7 @@ use Fomvasss\Variable\Facades\Variable;
 
 Variable::all();
 Variable::get('var_key');
+Variable::set('var_key', 'var_value');
 ```
 
 You can use the localization vars:

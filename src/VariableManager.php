@@ -43,13 +43,31 @@ class VariableManager implements VariableManagerContract
      * @param null $default
      * @return mixed|null
      */
-    public function get(string $key, $default = null)
+    public function get(string $key, $default = null, bool $useCache = true)
     {
+        if ($useCache === false) {
+            $var = $this->variableModel->where('key', $key)
+                ->when($this->locale, function ($q) {
+                    $q->where('locale', $this->locale);
+                })
+                ->first();
+            return $var ? $var->value : $default;
+        }
+
        if (isset($this->all()[$key])) {
            return $this->all()[$key];
        }
        
        return $default;
+    }
+
+    public function set(string $key, $value = null)
+    {
+        return $this->variableModel->updateOrCreate([
+            'key' => $key,
+        ], [
+            'value' => $value,
+        ]);
     }
 
     /**
@@ -84,6 +102,11 @@ class VariableManager implements VariableManagerContract
         $this->locale = $locale;
 
         return $this;
+    }
+
+    public function cacheOff()
+    {
+
     }
 
     public function cacheClear()
