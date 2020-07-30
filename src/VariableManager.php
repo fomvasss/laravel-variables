@@ -75,19 +75,15 @@ class VariableManager implements VariableManagerContract
      */
     public function all(): array
     {
-        if ($this->variables === null) {
+        $all = $this->cacheRepository->remember($this->config['cache']['name'], $this->config['cache']['time'], function () {
+            return $this->getCollection();
+        });
 
-            $all = $this->cacheRepository->remember($this->config['cache']['name'], $this->config['cache']['time'], function () {
-                return $this->getCollection();
-            });
-
-            if ($all) {
-                $allByLocale = $this->locale ? $all->where('locale', $this->locale) : $all;
-                $this->variables = $allByLocale->pluck('value', 'key')->toArray();
-            } else {
-                $this->variables = [];
-            }
-
+        if ($all) {
+            $allByLocale = $this->locale ? $all->where('locale', $this->locale) : $all;
+            $this->variables = $allByLocale->pluck('value', 'key')->toArray();
+        } else {
+            $this->variables = [];
         }
 
         return $this->variables;
