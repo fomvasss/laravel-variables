@@ -54,17 +54,25 @@ class VariableManager implements VariableManagerContract
             return $var ? $var->value : $default;
         }
 
-       if (isset($this->all()[$key])) {
-           return $this->all()[$key];
+        if ($collection = $this->getCollection()) {
+           if ($var = $collection
+               ->where('key', $key)
+               ->whereIn('locale', [$this->locale, null])
+               //->orWhere('locale', null)
+               ->first()) {
+
+               return $var->value;
+           }
        }
        
        return $default;
     }
 
-    public function set(string $key, $value = null)
+    public function set(string $key, $value = null, $locale = null)
     {
         return $this->variableModel->updateOrCreate([
             'key' => $key,
+            'locale' => $locale ?: $this->locale,
         ], [
             'value' => $value,
         ]);
@@ -75,13 +83,9 @@ class VariableManager implements VariableManagerContract
      */
     public function all(): array
     {
-        $all = $this->cacheRepository->remember($this->config['cache']['name'], $this->config['cache']['time'], function () {
-            return $this->getCollection();
-        });
-
-        if ($all) {
+        if ($all = $this->getCollection()) {
             $allByLocale = $this->locale ? $all->where('locale', $this->locale) : $all;
-            $this->variables = $allByLocale->pluck('value', 'key')->toArray();
+            $this->variables = $allByLocale->toArray();
         } else {
             $this->variables = [];
         }
@@ -116,7 +120,9 @@ class VariableManager implements VariableManagerContract
     protected function getCollection()
     {
         try {
-            return $this->variableModel->select('key', 'value', 'locale')->get();
+            return $this->cacheRepository->remember($this->config['cache']['name'], $this->config['cache']['time'], function () {
+                return $this->variableModel->select('key', 'value', 'locale')->get();
+            });
         } catch (\Exception $exception) {
             $this->app['log']->info(__CLASS__ . ': ' . $exception->getMessage());
 
