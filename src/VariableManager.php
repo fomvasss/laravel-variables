@@ -55,17 +55,24 @@ class VariableManager implements VariableManagerContract
         }
 
         if ($collection = $this->getCollection()) {
-           if ($var = $collection
-               ->where('key', $key)
-               ->whereIn('locale', [$this->locale, null])
-               //->orWhere('locale', null)
-               ->first()) {
+            if ($var = $collection
+                ->where('key', $key)
+                ->where('locale', $this->locale)
+                ->first()) {
 
-               return $var->value;
-           }
-       }
-       
-       return $default;
+                return $var->value ?: $default;
+            }
+
+            if ($var = $collection
+                ->where('key', $key)
+                ->where('locale', null)
+                ->first()) {
+
+                return $var->value ?: $default;
+            }
+        }
+
+        return $default;
     }
 
     public function set(string $key, $value = null, $locale = null)
