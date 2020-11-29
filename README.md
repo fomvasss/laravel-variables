@@ -6,65 +6,70 @@
 [![License](https://poser.pugx.org/fomvasss/laravel-variables/license)](https://packagist.org/packages/fomvasss/laravel-variables)
 [![Quality Score](https://img.shields.io/scrutinizer/g/fomvasss/laravel-variables.svg?style=flat-square)](https://scrutinizer-ci.com/g/fomvasss/laravel-variables)
 
+Dynamic management of variables/configs in Laravel app: creating and updating they in database, using cache and artisan commands, replace default Laravel configs, etc.
+
 ## Installation
 Run:
 ```bash
-	composer require fomvasss/laravel-variables
+composer require fomvasss/laravel-variables
 ```
 ---
 
 Publish the config, migration:
 ```bash
-	php artisan vendor:publish --provider="Fomvasss\Variable\VariableServiceProvider"
+php artisan vendor:publish --provider="Fomvasss\Variable\VariableServiceProvider"
 ```
 
 Run migrate:
 ```bash
-	php artisan migrate
+php artisan migrate
 ```
 
 ---
 ## Usage
 
-### Facade
+### Facade `Variable`
 
 ```php
 <?php
-use Fomvasss\Variable\Facades\Variable;
-
 Variable::all();
 Variable::get('var_key');
-Variable::set('var_key', 'var_value');
+Variable::save('app_name', 'My site Some Name');
 ```
 
-You can use the localization vars:
+Use multilanguages variables:
 ```php
 <?php
-Variable::locale('en')->all();
-Variable::locale('ru')->get('var_key');
-```
+Variable::setLang('en')->all(); // return Collection!
+Variable::setLang('ru')->get('var_key');
 
-### DI VariableManagerContract class
+```
+Use cache variables:
 ```php
-function (\Fomvasss\Variable\VariableManagerContract $variable)
-{
-	$variable->get('app_name');
-}
+Variable::setLang('ru')->save('app_name', 'Blog');
+Variable::setLang('ru')->useCache(false)->get('app_name');
+//or
+Variable::get('var_key', null, 'ru', false);
 ```
 
 ### Helpers
-- `variable($name, $default = null, $locale = null)`
+```php
+variable($name, $default = null, $langcode = null)
+```
 
-### Replace configs with variables
+
+### Replace Laravel configs with variables
 
 Set in `config/variables.php` option `config_key_for_vars=vars`
 
-Add keys in `variable_config` array: variable_key = config_key
+Add keys in `variable_config` array: `variable_key => config_key`
 
 ### Console command
 ```bash
-variable:all     # Get all variables
-variable:get     # Get one variable
+variable:all            # Show all variables
+variable:get            # Get single variable
+variable:save           # Save single variable
+variable:cache-clear    # Cache clear all variables
 ```
 
 ### Use cache
@@ -72,14 +77,16 @@ Set in `config/variables.php` option `cache.time` seconds for cache.
 
 Clear variable cache with console:
 ```bash
+php artisan variable:cache-clear
+```
+or
+```bash
 php artisan cache:forget laravel.variables.cache
 ```
 
 Clear variable cache in controller after update var:
 ```php
 Variable::cacheClear();
-```
-or
-```php
+//or
 \Cache::forget('laravel.variables.cache');
 ```

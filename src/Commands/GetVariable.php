@@ -4,24 +4,24 @@ namespace Fomvasss\Variable\Commands;
 
 use Illuminate\Console\Command;
 
-/**
- * Class TaxonomyMigrate
- *
- * @package \Fomvasss\Taxonomy
- */
 class GetVariable extends Command
 {
     protected $signature = 'variable:get
-                {name : The name variable}
-                {locale? : The locale variable}';
+                {key : The variable key}
+                {--langcode= : The language code}
+                {--cache=true : Use cache}';
 
-    protected $description = 'Get one variable';
+    protected $description = 'Get single variable';
 
     public function handle()
     {
         $variableMng = app(\Fomvasss\Variable\VariableManagerContract::class);
 
-        $variable = $variableMng->locale($this->argument('locale'))->get($this->argument('name'));
+        $useCache = in_array($this->option('cache'), ['0', 'false', false]) ? false : true;
+        $variable = $variableMng
+//            ->setLang($this->option('langcode'))
+//            ->setIsUseCache($this->option('cache'))
+            ->get($this->argument('key'), null, $this->option('langcode'), $useCache);
 
         print_r($variable . "\n");
     }

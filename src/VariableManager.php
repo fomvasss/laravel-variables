@@ -2,6 +2,9 @@
 
 namespace Fomvasss\Variable;
 
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
+
 /**
  * Class VariableManager
  *
@@ -11,16 +14,24 @@ class VariableManager implements VariableManagerContract
 {
     protected $app;
 
+    /** @var \Fomvasss\Variable\Models\Variable */
     protected $variableModel;
 
+    /** @var \Illuminate\Cache\Repository */
     protected $cacheRepository;
 
-    protected $locale = null;
+    /** @var string */
+    protected $langcode = null;
 
+    /** @var \Illuminate\Database\Eloquent\Collection */
     protected $variables = null;
+
+    /** @var bool */
+    protected $isUseCache;
 
     /**
      * VariableManager constructor.
+     * @param $variableModel
      * @param $cacheRepository
      * @param null $app
      */
@@ -32,6 +43,8 @@ class VariableManager implements VariableManagerContract
         $this->app = $app;
 
         $this->config = $this->app['config']->get('variables');
+        
+        $this->isUseCache = $this->config['cache']['is_use_cache'] ?? true;
 
         $this->variableModel = $variableModel;
 
@@ -39,101 +52,131 @@ class VariableManager implements VariableManagerContract
     }
 
     /**
+     * @param string|null $langcode
+     * @param bool|null $isUseCache
+     * @return array|\Illuminate\Database\Eloquent\Collection
+     */
+    public function all(?string $langcode = null, ?bool $isUseCache = null)
+    {
+        $langcode = $langcode ?: $this->langcode;
+        $isUseCache = $isUseCache === null
+            ? $this->isUseCache
+            : $isUseCache;
+
+        if ($langcode) {
+            return $this->getCollection($isUseCache)->where('langcode', $langcode);
+        }
+
+        return $this->getCollection($isUseCache);
+    }
+    
+    /**
      * @param string $key
      * @param null $default
+     * @param string|null $langcode
+     * @param bool $useCache
      * @return mixed|null
      */
-    public function get(string $key, $default = null, bool $useCache = true)
+    public function get(string $key, $default = null, ?string $langcode = null, ?bool $isUseCache = null)
     {
-        if ($useCache === false) {
-            $var = $this->variableModel->where('key', $key)
-                ->when($this->locale, function ($q) {
-                    $q->where('locale', $this->locale);
-                })
-                ->first();
-            return $var ? $var->value : $default;
+        $langcode = $langcode ?: $this->langcode;
+        $isUseCache = $isUseCache === null
+            ? $this->isUseCache
+            : $isUseCache;
+
+        if ($var = $this->getCollection($isUseCache)
+            ->where('key', $key)
+            ->where('langcode', $langcode)
+            ->first()) {
+
+            return $var->value ?: $default;
         }
 
-        if ($collection = $this->getCollection()) {
-            if ($var = $collection
-                ->where('key', $key)
-                ->where('locale', $this->locale)
-                ->first()) {
+        if ($var = $var = $this->getCollection($isUseCache)
+            ->where('key', $key)
+            ->where('langcode', null)
+            ->first()) {
 
-                return $var->value ?: $default;
-            }
-
-            if ($var = $collection
-                ->where('key', $key)
-                ->where('locale', null)
-                ->first()) {
-
-                return $var->value ?: $default;
-            }
+            return $var->value ?: $default;
         }
-
+        
         return $default;
     }
 
-    public function set(string $key, $value = null, $locale = null)
+    /**
+     * @param string $key
+     * @param null $value
+     * @param string|null $langcode
+     * @return mixed
+     */
+    public function save(string $key, $value = null, ?string $langcode = null)
     {
-        return $this->variableModel->updateOrCreate([
+        return $this->getVariableModel()->updateOrCreate([
             'key' => $key,
-            'locale' => $locale ?: $this->locale,
+            'langcode' => $langcode ?: $this->langcode,
         ], [
             'value' => $value,
         ]);
     }
 
     /**
-     * @return array
-     */
-    public function all(): array
-    {
-        if ($all = $this->getCollection()) {
-            $allByLocale = $this->locale ? $all->where('locale', $this->locale) : $all;
-            $this->variables = $allByLocale->toArray();
-        } else {
-            $this->variables = [];
-        }
-
-        return $this->variables;
-    }
-
-    /**
-     * @param string $locale
+     * @param string|null $langcode
      * @return $this
      */
-    public function locale(string $locale = null)
+    public function setLang(?string $langcode = null): VariableManagerContract
     {
-        $this->locale = $locale;
+        $this->langcode = $langcode;
 
         return $this;
     }
 
-    public function cacheOff()
+    /**
+     * @param bool $val
+     * @return $this|mixed
+     */
+    public function useCache(bool $val = true): VariableManagerContract
     {
-
+        $this->isUseCache = $val;
+        
+        return $this;
     }
 
+    /**
+     * @return bool
+     */
     public function cacheClear()
     {
         return $this->cacheRepository->forget($this->config['cache']['name']);
     }
 
     /**
-     * @return |null
+     * @return \Illuminate\Database\Eloquent\Collection
      */
-    protected function getCollection()
+    protected function getCollection(bool $isUseCache): \Illuminate\Database\Eloquent\Collection
     {
         try {
-            return $this->cacheRepository->remember($this->config['cache']['name'], $this->config['cache']['time'], function () {
-                return $this->variableModel->select('key', 'value', 'locale')->get();
-            });
+            if ($isUseCache) {
+                return $this->cacheRepository->remember(
+                    $this->config['cache']['name'],
+                    $this->config['cache']['time'],
+                    function () {
+                        return $this->getVariableModel()->all();
+                    });  
+            } else {
+                return $this->getVariableModel()->all();
+            }
         } catch (\Exception $exception) {
-            $this->app['log']->info(__CLASS__ . ': ' . $exception->getMessage());
+            $this->app['log']->warning($exception->getMessage());
 
-            return false;
+            return new \Illuminate\Database\Eloquent\Collection;
         }
+    }
+
+    /**
+     * @return Model
+     */
+    protected function getVariableModel(): Model
+    {
+        return $this->variableModel;
     }
 }

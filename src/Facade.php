@@ -1,10 +1,11 @@
 <?php
 
-namespace Fomvasss\Variable\Facades;
+namespace Fomvasss\Variable;
 
-use Fomvasss\Variable\VariableManagerContract;
-
-class Variable extends \Illuminate\Support\Facades\Facade
+/**
+ * @see \Fomvasss\Variable\VariableManager
+ */
+class Facade extends \Illuminate\Support\Facades\Facade
 {
     /**
      * @return string

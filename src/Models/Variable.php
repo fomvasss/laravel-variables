@@ -18,4 +18,20 @@ class Variable extends Model
 
         $this->setTable(config('variables.table_name'));
     }
+
+    protected static function booted()
+    {
+        static::saved(function ($model) {
+            if (config('variables.cache.autoclear')) {
+                app(\Fomvasss\Variable\VariableManagerContract::class)->cacheClear();
+            }
+        });
+    }
+
+    public function byLangcode($query, ?string $langcode = null)
+    {
+        return $query->when($langcode, function ($q) use ($langcode) {
+           $q->where('langcode', $langcode);
+        });
+    }
 }

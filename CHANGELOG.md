@@ -1,5 +1,11 @@
 # Changelog LaravelVariables
 
+## 4.0.0 - 202-11-30
+- Support Laravel 8
+- Upd DB table: locale => langcode
+- Add new command, upd old
+- Refactor code
+
 ## 3.1.0 - 2019-09-24
 - Support Laravel 6
 

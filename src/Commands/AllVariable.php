@@ -4,15 +4,11 @@ namespace Fomvasss\Variable\Commands;
 
 use Illuminate\Console\Command;
 
-/**
- * Class TaxonomyMigrate
- *
- * @package \Fomvasss\Taxonomy
- */
 class AllVariable extends Command
 {
     protected $signature = 'variable:all
-                {locale? : The locale variable}';
+                {--langcode= : The language code}
+                {--cache=true : Use cache}';
 
     protected $description = 'Get all variables';
 
@@ -20,7 +16,10 @@ class AllVariable extends Command
     {
         $variableMng = app(\Fomvasss\Variable\VariableManagerContract::class);
 
-        $variables = $variableMng->locale($this->argument('locale'))->all();
+        $useCache = in_array($this->option('cache'), ['0', 'false', false]) ? false : true;
+        $variables = $variableMng
+            ->all($this->option('langcode'), $useCache)
+            ->toArray();
 
         print_r($variables);
     }

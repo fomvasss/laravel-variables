@@ -19,9 +19,8 @@ class CreateVariablesTable extends Migration
                 $table->bigIncrements('id');
                 $table->string('key')->index();
                 $table->text('value')->nullable();
-                $table->string('locale', 5)->nullable();
-                
-                $table->unique(['key', 'locale']);
+                $table->string('langcode', 10)->nullable();
+                $table->unique(['key', 'langcode']);
             });
         }
 

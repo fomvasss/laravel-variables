@@ -7,10 +7,10 @@ if (! function_exists('variable')) {
      * @param null $locale
      * @return mixed
      */
-    function variable($name = null, $default = null, $locale = null)
+    function variable($name, $default = null, $langcode = null)
     {
         return app(\Fomvasss\Variable\VariableManagerContract::class)
-            ->locale($locale)
+            ->setLang($langcode)
             ->get($name, $default);
     }
 }

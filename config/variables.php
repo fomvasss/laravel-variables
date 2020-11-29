@@ -8,20 +8,20 @@
 */
 return [
 
-    'model' => \Fomvasss\Variable\Variable::class,
+    'model_name' => \Fomvasss\Variable\Models\Variable::class,
 
     'table_name' => 'variables',
 
     /* -----------------------------------------------------------------
-     |  Root key for config, example: 'vars'
-     |  Use: config('vars.some_var')
+     |  Root key for usage vars in Laravel config, example.
+     |  Usage: config('vars.some_var')
      |  If empty this - option OFF
      | -----------------------------------------------------------------
      */
     'config_key_for_vars' => 'vars',
 
     /* -----------------------------------------------------------------
-     |  Replace configs with variables
+     |  Dynamic replace config keys with variables
      | -----------------------------------------------------------------
      */
     'variable_config' => [
@@ -35,6 +35,10 @@ return [
      | -----------------------------------------------------------------
      */
     'cache' => [
+        
+        'is_use_cache' => true,
+        
+        'autoclear' => true, // ex: After saved/updated var model 
 
         'time' => 3600, //sec.
 
