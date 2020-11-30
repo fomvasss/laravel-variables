@@ -42,8 +42,14 @@ Use multilanguages variables:
 <?php
 Variable::setLang('en')->all(); // return Collection!
 Variable::setLang('ru')->get('var_key');
-
 ```
+
+Use array (json) variables:
+```
+Variable::saveArray('links', ['https::google.com', 'https://laravel.com']);   // save PHP array
+Variable::getArray('links');    // return PHP array
+```
+
 Use cache variables:
 ```php
 Variable::setLang('ru')->save('app_name', 'Blog');

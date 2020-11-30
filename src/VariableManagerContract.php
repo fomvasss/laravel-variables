@@ -6,19 +6,19 @@ interface VariableManagerContract
 {
     /**
      * @param string|null $langcode
-     * @param bool|null $isUseCache
-     * @return array|\Illuminate\Database\Eloquent\Collection
+     * @param bool|null $useCache
+     * @return \Illuminate\Database\Eloquent\Collection|mixed
      */
-    public function all(?string $langcode = null, ?bool $isUseCache = null);
+    public function all(?string $langcode = null, ?bool $useCache = null);
 
     /**
      * @param string $key
      * @param null $default
      * @param string|null $langcode
-     * @param bool|null $isUseCache
+     * @param bool|null $useCache
      * @return mixed
      */
-    public function get(string $key, $default = null, ?string $langcode = null, ?bool $isUseCache = null);
+    public function get(string $key, $default = null, ?string $langcode = null, ?bool $useCache = null);
 
     /**
      * @param string $key

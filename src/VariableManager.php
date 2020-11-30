@@ -27,7 +27,7 @@ class VariableManager implements VariableManagerContract
     protected $variables = null;
 
     /** @var bool */
-    protected $isUseCache;
+    protected $useCache;
 
     /**
      * VariableManager constructor.
@@ -44,7 +44,7 @@ class VariableManager implements VariableManagerContract
 
         $this->config = $this->app['config']->get('variables');
         
-        $this->isUseCache = $this->config['cache']['is_use_cache'] ?? true;
+        $this->useCache = $this->config['cache']['is_use_cache'] ?? true;
 
         $this->variableModel = $variableModel;
 
@@ -53,38 +53,38 @@ class VariableManager implements VariableManagerContract
 
     /**
      * @param string|null $langcode
-     * @param bool|null $isUseCache
-     * @return array|\Illuminate\Database\Eloquent\Collection
+     * @param bool|null $useCache
+     * @return \Illuminate\Database\Eloquent\Collection|mixed
      */
-    public function all(?string $langcode = null, ?bool $isUseCache = null)
+    public function all(?string $langcode = null, ?bool $useCache = null)
     {
         $langcode = $langcode ?: $this->langcode;
-        $isUseCache = $isUseCache === null
-            ? $this->isUseCache
-            : $isUseCache;
+        $useCache = $useCache === null
+            ? $this->useCache
+            : $useCache;
 
         if ($langcode) {
-            return $this->getCollection($isUseCache)->where('langcode', $langcode);
+            return $this->getCollection($useCache)->where('langcode', $langcode);
         }
 
-        return $this->getCollection($isUseCache);
+        return $this->getCollection($useCache);
     }
-    
+
     /**
      * @param string $key
      * @param null $default
      * @param string|null $langcode
-     * @param bool $useCache
+     * @param bool|null $useCache
      * @return mixed|null
      */
-    public function get(string $key, $default = null, ?string $langcode = null, ?bool $isUseCache = null)
+    public function get(string $key, $default = null, ?string $langcode = null, ?bool $useCache = null)
     {
         $langcode = $langcode ?: $this->langcode;
-        $isUseCache = $isUseCache === null
-            ? $this->isUseCache
-            : $isUseCache;
+        $useCache = $useCache === null
+            ? $this->useCache
+            : $useCache;
 
-        if ($var = $this->getCollection($isUseCache)
+        if ($var = $this->getCollection($useCache)
             ->where('key', $key)
             ->where('langcode', $langcode)
             ->first()) {
@@ -92,7 +92,7 @@ class VariableManager implements VariableManagerContract
             return $var->value ?: $default;
         }
 
-        if ($var = $var = $this->getCollection($isUseCache)
+        if ($var = $var = $this->getCollection($useCache)
             ->where('key', $key)
             ->where('langcode', null)
             ->first()) {
@@ -120,6 +120,33 @@ class VariableManager implements VariableManagerContract
     }
 
     /**
+     * @param string $key
+     * @param array $default
+     * @param string|null $langcode
+     * @param bool|null $useCache
+     * @return array|mixed
+     */
+    public function getArray(string $key, $default = [], ?string $langcode = null, ?bool $useCache = null)
+    {
+        $res = json_decode($this->get($key, '[]', $langcode, $useCache), true);
+
+        return  empty($res) ? $default : $res;
+    }
+
+    /**
+     * @param string $key
+     * @param array $value
+     * @param string|null $langcode
+     * @return mixed
+     */
+    public function saveArray(string $key, $value = [], ?string $langcode = null)
+    {
+        $value = json_encode($value);
+
+        return $this->save($key, $value, $langcode);
+    }
+
+    /**
      * @param string|null $langcode
      * @return $this
      */
@@ -136,7 +163,7 @@ class VariableManager implements VariableManagerContract
      */
     public function useCache(bool $val = true): VariableManagerContract
     {
-        $this->isUseCache = $val;
+        $this->useCache = $val;
         
         return $this;
     }
@@ -152,10 +179,10 @@ class VariableManager implements VariableManagerContract
     /**
      * @return \Illuminate\Database\Eloquent\Collection
      */
-    protected function getCollection(bool $isUseCache): \Illuminate\Database\Eloquent\Collection
+    protected function getCollection(bool $useCache): \Illuminate\Database\Eloquent\Collection
     {
         try {
-            if ($isUseCache) {
+            if ($useCache) {
                 return $this->cacheRepository->remember(
                     $this->config['cache']['name'],
                     $this->config['cache']['time'],

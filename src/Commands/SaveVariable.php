@@ -9,7 +9,7 @@ class SaveVariable extends Command
     protected $signature = 'variable:save
                 {key : The variable key}
                 {value : The variable value}
-                {langcode? : The language code}';
+                {--langcode= : The language code}';
 
     protected $description = 'Update or create single variable';
 
@@ -18,7 +18,7 @@ class SaveVariable extends Command
         $variableMng = app(\Fomvasss\Variable\VariableManagerContract::class);
 
         $variable = $variableMng
-            ->save($this->argument('key'), $this->argument('value'), $this->argument('langcode'));
+            ->save($this->argument('key'), $this->argument('value'), $this->option('langcode'));
 
         $this->info('Variable successfully saved!');
     }

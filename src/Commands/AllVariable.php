@@ -18,9 +18,10 @@ class AllVariable extends Command
 
         $useCache = in_array($this->option('cache'), ['0', 'false', false]) ? false : true;
         $variables = $variableMng
-            ->all($this->option('langcode'), $useCache)
-            ->toArray();
+            ->all($this->option('langcode'), $useCache);
 
-        print_r($variables);
+        foreach ($variables as $item) {
+            $this->info("$item->key [$item->langcode] : $item->value");
+        }
     }
 }
