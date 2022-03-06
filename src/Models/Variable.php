@@ -26,6 +26,12 @@ class Variable extends Model
                 app(\Fomvasss\Variable\VariableManagerContract::class)->cacheClear();
             }
         });
+
+        foreach (config('variables.prepare_scopes', []) as $class) {
+            if (class_exists($class)) {
+                static::addGlobalScope(new $class);
+            }
+        }
     }
 
     public function byLangcode($query, ?string $langcode = null)

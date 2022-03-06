@@ -30,6 +30,13 @@ return [
         'some_var' => 'services.some.var',          // config('services.some.var')
     ],
 
+    /*
+     * Apply global scopes for variable model.
+     */
+    'prepare_scopes' => [
+        //...
+    ],
+
     /* -----------------------------------------------------------------
      |  Cache settings for vars
      | -----------------------------------------------------------------

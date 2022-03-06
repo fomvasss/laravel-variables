@@ -60,7 +60,7 @@ Variable::get('var_key', null, 'ru', false);
 
 ### Helpers
 ```php
-variable($name, $default = null, $langcode = null)
+variable($name, $default = null, $langcode = null);
 ```
 
 

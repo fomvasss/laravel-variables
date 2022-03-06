@@ -130,7 +130,7 @@ class VariableManager implements VariableManagerContract
     {
         $res = json_decode($this->get($key, '[]', $langcode, $useCache), true);
 
-        return  empty($res) ? $default : $res;
+        return empty($res) ? $default : $res;
     }
 
     /**
