@@ -7,7 +7,7 @@ use Illuminate\Console\Command;
 class AllVariable extends Command
 {
     protected $signature = 'variable:all
-                {--langcode= : The language code}
+                {--group= : The group name}
                 {--cache=true : Use cache}';
 
     protected $description = 'Get all variables';
@@ -18,10 +18,16 @@ class AllVariable extends Command
 
         $useCache = in_array($this->option('cache'), ['0', 'false', false]) ? false : true;
         $variables = $variableMng
-            ->all($this->option('langcode'), $useCache);
+            ->all($this->option('group'), $useCache);
 
+        $table = [];
         foreach ($variables as $item) {
-            $this->info("$item->key [$item->langcode] : $item->value");
+            $table[] = [$item->id, $item->key, $item->value, $item->group];
         }
+
+        $this->getOutput()->newLine();
+        $this->alert('Variables');
+        $this->table(['#', 'Key', 'Valuy', 'Group',], $table);
+        $this->getOutput()->newLine(2);
     }
 }

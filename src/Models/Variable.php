@@ -34,10 +34,10 @@ class Variable extends Model
         }
     }
 
-    public function byLangcode($query, ?string $langcode = null)
+    public function byGroup($query, ?string $group = null)
     {
-        return $query->when($langcode, function ($q) use ($langcode) {
-           $q->where('langcode', $langcode);
+        return $query->when($group, function ($q) use ($group) {
+           $q->where('group', $group);
         });
     }
 }

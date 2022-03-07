@@ -5,34 +5,34 @@ namespace Fomvasss\Variable;
 interface VariableManagerContract
 {
     /**
-     * @param string|null $langcode
+     * @param string|null $group
      * @param bool|null $useCache
      * @return \Illuminate\Database\Eloquent\Collection|mixed
      */
-    public function all(?string $langcode = null, ?bool $useCache = null);
+    public function all(?string $group = null, ?bool $useCache = null);
 
     /**
      * @param string $key
      * @param null $default
-     * @param string|null $langcode
+     * @param string|null $group
      * @param bool|null $useCache
      * @return mixed
      */
-    public function get(string $key, $default = null, ?string $langcode = null, ?bool $useCache = null);
+    public function get(string $key, $default = null, ?string $group = null, ?bool $useCache = null);
 
     /**
      * @param string $key
      * @param null $value
-     * @param string|null $langcode
+     * @param string|null $group
      * @return mixed
      */
-    public function save(string $key, $value = null, ?string $langcode = null);
+    public function save(string $key, $value = null, ?string $group = null);
 
     /**
      * @param string $locale
      * @return mixed
      */
-    public function setLang(?string $langcode = null): VariableManagerContract;
+    public function setGroup(?string $group = null): VariableManagerContract;
 
     /**
      * @param bool $val

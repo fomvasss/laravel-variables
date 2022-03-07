@@ -40,8 +40,8 @@ Variable::save('app_name', 'My site Some Name');
 Use multilanguages variables:
 ```php
 <?php
-Variable::setLang('en')->all(); // return Collection!
-Variable::setLang('ru')->get('var_key');
+Variable::setGroup('en')->all(); // return Collection!
+Variable::setGroup('ru')->get('var_key');
 ```
 
 Use array (json) variables:
@@ -52,15 +52,15 @@ Variable::getArray('links');    // return PHP array
 
 Use cache variables:
 ```php
-Variable::setLang('ru')->save('app_name', 'Blog');
-Variable::setLang('ru')->useCache(false)->get('app_name');
+Variable::setGroup('ru')->save('app_name', 'Blog');
+Variable::setGroup('ru')->useCache(false)->get('app_name');
 //or
 Variable::get('var_key', null, 'ru', false);
 ```
 
 ### Helpers
 ```php
-variable($name, $default = null, $langcode = null);
+variable($name, $default = null, $group = null);
 ```
 
 

@@ -21,13 +21,16 @@ class VariableManager implements VariableManagerContract
     protected $cacheRepository;
 
     /** @var string */
-    protected $langcode = null;
+    protected $group = null;
 
     /** @var \Illuminate\Database\Eloquent\Collection */
     protected $variables = null;
 
     /** @var bool */
     protected $useCache;
+    
+    /** bool @var */
+    protected $fallbackAny;
 
     /**
      * VariableManager constructor.
@@ -45,6 +48,8 @@ class VariableManager implements VariableManagerContract
         $this->config = $this->app['config']->get('variables');
         
         $this->useCache = $this->config['cache']['is_use_cache'] ?? true;
+        
+        $this->fallbackAny = $this->config['fallback_any'] ?? false;
 
         $this->variableModel = $variableModel;
 
@@ -52,19 +57,19 @@ class VariableManager implements VariableManagerContract
     }
 
     /**
-     * @param string|null $langcode
+     * @param string|null $group
      * @param bool|null $useCache
      * @return \Illuminate\Database\Eloquent\Collection|mixed
      */
-    public function all(?string $langcode = null, ?bool $useCache = null)
+    public function all(?string $group = null, ?bool $useCache = null)
     {
-        $langcode = $langcode ?: $this->langcode;
+        $group = $group ?: $this->group;
         $useCache = $useCache === null
             ? $this->useCache
             : $useCache;
 
-        if ($langcode) {
-            return $this->getCollection($useCache)->where('langcode', $langcode);
+        if ($group) {
+            return $this->getCollection($useCache)->where('group', $group);
         }
 
         return $this->getCollection($useCache);
@@ -73,20 +78,20 @@ class VariableManager implements VariableManagerContract
     /**
      * @param string $key
      * @param null $default
-     * @param string|null $langcode
+     * @param string|null $group
      * @param bool|null $useCache
      * @return mixed|null
      */
-    public function get(string $key, $default = null, ?string $langcode = null, ?bool $useCache = null)
+    public function get(string $key, $default = null, ?string $group = null, ?bool $useCache = null)
     {
-        $langcode = $langcode ?: $this->langcode;
+        $group = $group ?: $this->group;
         $useCache = $useCache === null
             ? $this->useCache
             : $useCache;
 
         if ($var = $this->getCollection($useCache)
             ->where('key', $key)
-            ->where('langcode', $langcode)
+            ->where('group', $group)
             ->first()) {
 
             return $var->value ?: $default;
@@ -94,8 +99,17 @@ class VariableManager implements VariableManagerContract
 
         if ($var = $var = $this->getCollection($useCache)
             ->where('key', $key)
-            ->where('langcode', null)
+            ->where('group', null)
             ->first()) {
+
+            return $var->value ?: $default;
+        }
+
+
+        if ($this->fallbackAny && ($var = $var = $this->getCollection($useCache)
+            ->where('key', $key)
+            ->whereNotNull('group')
+            ->first())) {
 
             return $var->value ?: $default;
         }
@@ -106,14 +120,14 @@ class VariableManager implements VariableManagerContract
     /**
      * @param string $key
      * @param null $value
-     * @param string|null $langcode
+     * @param string|null $group
      * @return mixed
      */
-    public function save(string $key, $value = null, ?string $langcode = null)
+    public function save(string $key, $value = null, ?string $group = null)
     {
         return $this->getVariableModel()->updateOrCreate([
             'key' => $key,
-            'langcode' => $langcode ?: $this->langcode,
+            'group' => $group ?: $this->group,
         ], [
             'value' => $value,
         ]);
@@ -122,13 +136,13 @@ class VariableManager implements VariableManagerContract
     /**
      * @param string $key
      * @param array $default
-     * @param string|null $langcode
+     * @param string|null $group
      * @param bool|null $useCache
      * @return array|mixed
      */
-    public function getArray(string $key, $default = [], ?string $langcode = null, ?bool $useCache = null)
+    public function getArray(string $key, $default = [], ?string $group = null, ?bool $useCache = null)
     {
-        $res = json_decode($this->get($key, '[]', $langcode, $useCache), true);
+        $res = json_decode($this->get($key, '[]', $group, $useCache), true);
 
         return empty($res) ? $default : $res;
     }
@@ -136,23 +150,23 @@ class VariableManager implements VariableManagerContract
     /**
      * @param string $key
      * @param array $value
-     * @param string|null $langcode
+     * @param string|null $group
      * @return mixed
      */
-    public function saveArray(string $key, $value = [], ?string $langcode = null)
+    public function saveArray(string $key, $value = [], ?string $group = null)
     {
         $value = json_encode($value);
 
-        return $this->save($key, $value, $langcode);
+        return $this->save($key, $value, $group);
     }
 
     /**
-     * @param string|null $langcode
+     * @param string|null $group
      * @return $this
      */
-    public function setLang(?string $langcode = null): VariableManagerContract
+    public function setGroup(?string $group = null): VariableManagerContract
     {
-        $this->langcode = $langcode;
+        $this->group = $group;
 
         return $this;
     }

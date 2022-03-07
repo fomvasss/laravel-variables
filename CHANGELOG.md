@@ -1,6 +1,10 @@
-# Changelog LaravelVariables
+# Changelog
 
-## 4.0.0 - 202-11-30
+## 5.0.0 - 2022-03-07
+- Support Laravel 9
+- Upd DB table: langcode => group
+
+## 4.0.0 - 2020-11-30
 - Support Laravel 8
 - Upd DB table: locale => langcode
 - Add new command, upd old

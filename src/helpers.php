@@ -4,13 +4,13 @@ if (! function_exists('variable')) {
     /**
      * @param $name
      * @param null $default
-     * @param null $locale
+     * @param null $group
      * @return mixed
      */
-    function variable($name, $default = null, $langcode = null)
+    function variable($name, $default = null, $group = null)
     {
         return app(\Fomvasss\Variable\VariableManagerContract::class)
-            ->setLang($langcode)
+            ->setGroup($group)
             ->get($name, $default);
     }
 }

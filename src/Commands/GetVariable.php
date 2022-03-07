@@ -8,7 +8,7 @@ class GetVariable extends Command
 {
     protected $signature = 'variable:get
                 {key : The variable key}
-                {--langcode= : The language code}
+                {--group= : The group name}
                 {--cache=true : Use cache}';
 
     protected $description = 'Get single variable';
@@ -19,10 +19,10 @@ class GetVariable extends Command
 
         $useCache = in_array($this->option('cache'), ['0', 'false', false]) ? false : true;
         $variable = $variableMng
-//            ->setLang($this->option('langcode'))
-//            ->setIsUseCache($this->option('cache'))
-            ->get($this->argument('key'), null, $this->option('langcode'), $useCache);
+            ->get($this->argument('key'), null, $this->option('group'), $useCache);
 
-        print_r($variable . "\n");
+        $this->alert("Variable [{$this->argument('key')}]:");
+        $this->info($variable);
+        $this->getOutput()->newLine();
     }
 }

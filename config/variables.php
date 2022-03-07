@@ -50,5 +50,11 @@ return [
         'time' => 3600, //sec.
 
         'name' => 'laravel.variables.cache',
-    ]
+    ],
+
+    /*
+     * If a variable has not been set for a given group,
+     * any other group will be chosen instead.
+     */
+    'fallback_any' => false,
 ];

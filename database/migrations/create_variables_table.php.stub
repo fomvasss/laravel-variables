@@ -19,8 +19,8 @@ return new class extends Migration
             $table->bigIncrements('id');
             $table->string('key')->index();
             $table->text('value')->nullable();
-            $table->string('langcode', 10)->nullable();
-            $table->unique(['key', 'langcode']);
+            $table->string('group', 10)->nullable();
+            $table->unique(['key', 'group']);
         });
     }
 
