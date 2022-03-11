@@ -94,7 +94,7 @@ class VariableManager implements VariableManagerContract
             ->where('group', $group)
             ->first()) {
 
-            return $var->value ?: $default;
+            return $var->value ?? $default;
         }
 
         if ($var = $var = $this->getCollection($useCache)
@@ -102,7 +102,7 @@ class VariableManager implements VariableManagerContract
             ->where('group', null)
             ->first()) {
 
-            return $var->value ?: $default;
+            return $var->value ?? $default;
         }
 
 
@@ -111,7 +111,7 @@ class VariableManager implements VariableManagerContract
             ->whereNotNull('group')
             ->first())) {
 
-            return $var->value ?: $default;
+            return $var->value ?? $default;
         }
         
         return $default;
