@@ -162,6 +162,8 @@ class VariableManager implements VariableManagerContract
         if ($varKeys) {
             $res = Arr::get($res, $varKeys);
         }
+
+        return empty($res) ? $default : $res;
     }
 
     /**
