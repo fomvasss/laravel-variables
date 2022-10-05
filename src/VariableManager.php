@@ -154,7 +154,7 @@ class VariableManager implements VariableManagerContract
         $varKeys = '';
         if ($d = $this->arrayDelimiter) {
             $varKey = substr($key, 0, strpos($key, $d)) ?: $key;
-            $varKeys = substr($key,  strpos($key, $d) + 1);
+            $varKeys = strpos($key, $d) ? substr($key,  strpos($key, $d) + 1) : '';
         }
         
         $res = json_decode($this->get($varKey, '[]', $group, $useCache), true);
