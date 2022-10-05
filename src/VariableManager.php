@@ -3,6 +3,7 @@
 namespace Fomvasss\Variable;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 
 /**
@@ -28,6 +29,9 @@ class VariableManager implements VariableManagerContract
 
     /** @var bool */
     protected $useCache;
+
+    /** @var mixed|string */
+    protected $arrayDelimiter;
     
     /** bool @var */
     protected $fallbackAny;
@@ -48,6 +52,8 @@ class VariableManager implements VariableManagerContract
         $this->config = $this->app['config']->get('variables');
         
         $this->useCache = $this->config['cache']['is_use_cache'] ?? true;
+
+        $this->arrayDelimiter = $this->config['array_delimiter'] ?? '';
         
         $this->fallbackAny = $this->config['fallback_any'] ?? false;
 
@@ -144,9 +150,18 @@ class VariableManager implements VariableManagerContract
      */
     public function getArray(string $key, $default = [], ?string $group = null, ?bool $useCache = null)
     {
-        $res = json_decode($this->get($key, '[]', $group, $useCache), true);
+        $varKey = $key;
+        $varKeys = '';
+        if ($d = $this->arrayDelimiter) {
+            $varKey = substr($key, 0, strpos($key, $d)) ?: $key;
+            $vakKeys = substr($key,  strpos($key, $d) + 1);
+        }
+        
+        $res = json_decode($this->get($varKey, '[]', $group, $useCache), true);
 
-        return empty($res) ? $default : $res;
+        if ($varKeys) {
+            $res = Arr::get($res, $varKeys);
+        }
     }
 
     /**
