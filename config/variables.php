@@ -44,14 +44,20 @@ return [
     'array_delimiter' => '.',
 
     /* -----------------------------------------------------------------
+     |  Use delimiter in var key (example: uk|title, en|title)
+     | -----------------------------------------------------------------
+     */
+    'group_key_delimiter' => '|',
+
+    /* -----------------------------------------------------------------
      |  Cache settings for vars
      | -----------------------------------------------------------------
      */
     'cache' => [
-        
+
         'is_use_cache' => true,
-        
-        'autoclear' => true, // ex: After saved/updated var model 
+
+        'autoclear' => true, // ex: After saved/updated var model
 
         'time' => 3600, //sec.
 

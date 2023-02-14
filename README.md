@@ -36,28 +36,31 @@ php artisan migrate
 <?php
 Variable::all();
 Variable::get('var_key');
-Variable::save('app_name', 'My site Some Name');
+Variable::save('app_name', 'My Var');
 ```
 
-Use multilanguages variables:
+Use groupped (multilanguages) variables:
 ```php
 <?php
 Variable::setGroup('en')->all(); // return Collection!
-Variable::setGroup('ru')->get('var_key');
+Variable::setGroup('uk')->get('var_key');
+Variable::get('var_key', null, 'en'); 
+Variable::get('en|var_key');
+Variable::save('uk|var_key', 'UK var');
 ```
 
 Use array (json) variables:
-```
+```php
 Variable::saveArray('links', ['https::google.com', 'https://laravel.com']);   // save PHP array
 Variable::getArray('links');    // return PHP array
 ```
 
 Use cache variables:
 ```php
-Variable::setGroup('ru')->save('app_name', 'Blog');
-Variable::setGroup('ru')->useCache(false)->get('app_name');
+Variable::setGroup('uk')->save('app_name', 'Blog');
+Variable::setGroup('uk')->useCache(false)->get('app_name');
 //or
-Variable::get('var_key', null, 'ru', false);
+Variable::get('var_key', null, 'uk', false);
 ```
 
 ### Helpers

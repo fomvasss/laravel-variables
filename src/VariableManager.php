@@ -32,7 +32,10 @@ class VariableManager implements VariableManagerContract
 
     /** @var mixed|string */
     protected $arrayDelimiter;
-    
+
+    /** @var mixed|string */
+    protected $groupKeyDelimiter;
+
     /** bool @var */
     protected $fallbackAny;
 
@@ -50,11 +53,13 @@ class VariableManager implements VariableManagerContract
         $this->app = $app;
 
         $this->config = $this->app['config']->get('variables');
-        
+
         $this->useCache = $this->config['cache']['is_use_cache'] ?? true;
 
         $this->arrayDelimiter = $this->config['array_delimiter'] ?? '';
-        
+
+        $this->groupKeyDelimiter = $this->config['group_key_delimiter'] ?? '';
+
         $this->fallbackAny = $this->config['fallback_any'] ?? false;
 
         $this->variableModel = $variableModel;
@@ -91,6 +96,7 @@ class VariableManager implements VariableManagerContract
     public function get(string $key, $default = null, ?string $group = null, ?bool $useCache = null)
     {
         $group = $group ?: $this->group;
+        list($group, $key) = $this->parseGroupKey($key, $group ?: $this->group);
         $useCache = $useCache === null
             ? $this->useCache
             : $useCache;
@@ -121,7 +127,7 @@ class VariableManager implements VariableManagerContract
 
             return $var->value ?? $default;
         }
-        
+
         return $default;
     }
 
@@ -133,9 +139,11 @@ class VariableManager implements VariableManagerContract
      */
     public function save(string $key, $value = null, ?string $group = null)
     {
+        list($group, $key) = $this->parseGroupKey($key, $group ?: $this->group);
+
         return $this->getVariableModel()->updateOrCreate([
             'key' => $key,
-            'group' => $group ?: $this->group,
+            'group' => $group,
         ], [
             'value' => $value,
         ]);
@@ -150,13 +158,15 @@ class VariableManager implements VariableManagerContract
      */
     public function getArray(string $key, $default = [], ?string $group = null, ?bool $useCache = null)
     {
+        list($group, $key) = $this->parseGroupKey($key, $group);
+
         $varKey = $key;
         $varKeys = '';
         if ($d = $this->arrayDelimiter) {
             $varKey = substr($key, 0, strpos($key, $d)) ?: $key;
             $varKeys = strpos($key, $d) ? substr($key,  strpos($key, $d) + 1) : '';
         }
-        
+
         $res = json_decode($this->get($varKey, '[]', $group, $useCache), true);
 
         if ($varKeys) {
@@ -175,6 +185,8 @@ class VariableManager implements VariableManagerContract
     public function saveArray(string $key, $value = [], ?string $group = null)
     {
         $value = json_encode($value);
+
+        list($group, $key) = $this->parseGroupKey($key, $group);
 
         return $this->save($key, $value, $group);
     }
@@ -197,7 +209,7 @@ class VariableManager implements VariableManagerContract
     public function useCache(bool $val = true): VariableManagerContract
     {
         $this->useCache = $val;
-        
+
         return $this;
     }
 
@@ -221,7 +233,7 @@ class VariableManager implements VariableManagerContract
                     $this->config['cache']['time'],
                     function () {
                         return $this->getVariableModel()->all();
-                    });  
+                    });
             } else {
                 return $this->getVariableModel()->all();
             }
@@ -238,5 +250,17 @@ class VariableManager implements VariableManagerContract
     protected function getVariableModel(): Model
     {
         return $this->variableModel;
+    }
+
+    protected function parseGroupKey(string $key, ?string $group = null): array
+    {
+        if ($this->groupKeyDelimiter) {
+            if (($pos = strpos($key, $this->groupKeyDelimiter)) !== false) {
+                $group = substr($key, 0, $pos) ?: null;
+                $key = substr($key, $pos+1);
+            }
+        }
+
+        return [$group, $key];
     }
 }
