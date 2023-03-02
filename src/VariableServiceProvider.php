@@ -50,7 +50,7 @@ class VariableServiceProvider extends ServiceProvider
         $this->app->singleton(VariableManagerContract::class, function () {
             $cacheRepo = $this->app->make(\Illuminate\Cache\Repository::class);
             $variableModel = $this->app['config']->get('variables.model_name');
-            
+
             return new VariableManager(new $variableModel, $cacheRepo, $this->app);
         });
     }
