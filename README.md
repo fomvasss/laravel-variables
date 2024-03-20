@@ -52,7 +52,7 @@ Variable::save('uk|var_key', 'UK var');
 Use array (json) variables:
 ```php
 Variable::saveArray('links', ['https::google.com', 'https://laravel.com']);   // save PHP array
-Variable::getArray('links');    // return PHP array
+Variable::getArray('links');    // return default PHP array!
 ```
 
 Use cache variables:
