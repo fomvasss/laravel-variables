@@ -14,6 +14,7 @@ use Illuminate\Support\Collection;
 class VariableManager implements VariableManagerContract
 {
     protected $app;
+    protected array $config;
 
     /** @var \Fomvasss\Variable\Models\Variable */
     protected $variableModel;
@@ -120,7 +121,7 @@ class VariableManager implements VariableManagerContract
         }
 
 
-        if ($this->fallbackAny && ($var = $var = $this->getCollection($useCache)
+        if ($this->fallbackAny && ($var = $this->getCollection($useCache)
             ->where('key', $key)
             ->whereNotNull('group')
             ->first())) {
