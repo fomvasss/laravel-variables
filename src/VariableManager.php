@@ -219,7 +219,17 @@ class VariableManager implements VariableManagerContract
      */
     public function cacheClear()
     {
+        $this->forgetLoaded();
+
         return $this->cacheRepository->forget($this->config['cache']['name']);
+    }
+
+    /**
+     * Forget variables kept in memory, the next call reads them from the cache again.
+     */
+    public function forgetLoaded(): void
+    {
+        $this->variables = null;
     }
 
     /**
@@ -229,7 +239,8 @@ class VariableManager implements VariableManagerContract
     {
         try {
             if ($useCache) {
-                return $this->cacheRepository->remember(
+                // Keep in memory: unserializing from the cache store on every get() is slow for big values
+                return $this->variables ??= $this->cacheRepository->remember(
                     $this->config['cache']['name'],
                     $this->config['cache']['time'],
                     function () {

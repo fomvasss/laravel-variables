@@ -83,6 +83,8 @@ variable:cache-clear    # Cache clear all variables
 ### Use cache
 Set in `config/variables.php` option `cache.time` seconds for cache.
 
+After the first read variables are also kept in memory until the end of the request, so repeated `Variable::get()` calls don't hit the cache store. Queue workers and Octane reset it before each job / request; `Variable::cacheClear()` resets it too.
+
 Clear variable cache with console:
 ```bash
 php artisan variable:cache-clear

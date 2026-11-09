@@ -28,6 +28,14 @@ class VariableServiceProvider extends ServiceProvider
 
         $this->replaceConfigsWithVariables();
 
+        // Long-lived processes (queue workers, Octane) must not keep stale variables between jobs and requests
+        $this->app['events']->listen([
+            'Illuminate\\Queue\\Events\\JobProcessing',
+            'Laravel\\Octane\\Events\\RequestReceived',
+        ], function () {
+            $this->app->make(VariableManagerContract::class)->forgetLoaded();
+        });
+
         if ($this->app->runningInConsole()) {
              $this->commands([
                  Commands\AllVariable::class,
